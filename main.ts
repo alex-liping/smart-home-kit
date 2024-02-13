@@ -18,7 +18,7 @@ function vstup_svetlo () {
 }
 function plyn_alarm () {
     plyn = pins.analogReadPin(AnalogPin.P3)
-    if (plyn > 3) {
+    if (plyn > 10) {
         for (let index = 0; index < 4; index++) {
             strip.setBrightness(255)
             music.play(music.tonePlayable(988, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
@@ -34,11 +34,54 @@ function plyn_alarm () {
 }
 input.onButtonPressed(Button.B, function () {
     pins.servoWritePin(AnalogPin.P13, 80)
-    basic.pause(2000)
+    basic.pause(5000)
     pins.servoWritePin(AnalogPin.P13, 175)
 })
+function dest_alarm () {
+    dest = pins.analogReadPin(AnalogPin.P4)
+    basic.pause(100)
+    if (dest > 200) {
+        for (let index = 0; index < 4; index++) {
+            music.play(music.tonePlayable(294, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+            music.rest(music.beat(BeatFraction.Half))
+            music.play(music.tonePlayable(294, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+            music.rest(music.beat(BeatFraction.Half))
+            music.play(music.tonePlayable(330, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+            music.rest(music.beat(BeatFraction.Half))
+            music.play(music.tonePlayable(294, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+            music.rest(music.beat(BeatFraction.Half))
+        }
+        for (let index = 0; index < 2; index++) {
+            for (let index = 0; index < 4; index++) {
+                music.play(music.tonePlayable(262, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+                music.rest(music.beat(BeatFraction.Half))
+            }
+            for (let index = 0; index < 3; index++) {
+                music.play(music.tonePlayable(247, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+                music.rest(music.beat(BeatFraction.Half))
+            }
+            music.rest(music.beat(BeatFraction.Half))
+            for (let index = 0; index < 2; index++) {
+                music.play(music.tonePlayable(220, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+                music.rest(music.beat(BeatFraction.Half))
+            }
+            for (let index = 0; index < 2; index++) {
+                music.play(music.tonePlayable(294, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+                music.rest(music.beat(BeatFraction.Half))
+            }
+            for (let index = 0; index < 3; index++) {
+                music.play(music.tonePlayable(196, music.beat(BeatFraction.Eighth)), music.PlaybackMode.UntilDone)
+                music.rest(music.beat(BeatFraction.Half))
+            }
+            music.rest(music.beat(BeatFraction.Half))
+        }
+    } else {
+        music.stopAllSounds()
+    }
+}
 let vlhkost = 0
 let teplota = 0
+let dest = 0
 let plyn = 0
 let PIR = 0
 let okolni_svetlo = 0
@@ -67,7 +110,7 @@ basic.forever(function () {
     makerbit.showStringOnLcd1602("teplota:", makerbit.position1602(LcdPosition1602.Pos1), 9)
     makerbit.showStringOnLcd1602("" + (teplota), makerbit.position1602(LcdPosition1602.Pos10), 3)
     makerbit.showStringOnLcd1602("st.C", makerbit.position1602(LcdPosition1602.Pos13), 4)
-    basic.pause(1000)
+    basic.pause(2000)
     makerbit.clearLcd1602()
     makerbit.showStringOnLcd1602("vlhkost:", makerbit.position1602(LcdPosition1602.Pos1), 9)
     makerbit.showStringOnLcd1602("" + (vlhkost), makerbit.position1602(LcdPosition1602.Pos10), 3)
@@ -78,5 +121,6 @@ basic.forever(function () {
         PIR = 0
     }
     vstup_svetlo()
+    dest_alarm()
     plyn_alarm()
 })
