@@ -9,9 +9,38 @@ function okol_svetlo () {
         pins.servoWritePin(AnalogPin.P16, 175)
     }
 }
-let PIR = 0
+function vstup_svetlo () {
+    if (PIR == 1 && okolni_svetlo < 500) {
+        pins.digitalWritePin(DigitalPin.P14, 1)
+    } else {
+        pins.digitalWritePin(DigitalPin.P14, 0)
+    }
+}
+function plyn_alarm () {
+    plyn = pins.analogReadPin(AnalogPin.P3)
+    if (plyn > 3) {
+        for (let index = 0; index < 4; index++) {
+            strip.setBrightness(255)
+            music.play(music.tonePlayable(988, music.beat(BeatFraction.Half)), music.PlaybackMode.UntilDone)
+            strip.showColor(neopixel.colors(NeoPixelColors.Red))
+            music.rest(music.beat(BeatFraction.Half))
+            strip.showColor(neopixel.colors(NeoPixelColors.Black))
+        }
+        serial.writeValue("plyn", plyn)
+        basic.pause(200)
+    } else {
+        music.stopAllSounds()
+    }
+}
+input.onButtonPressed(Button.B, function () {
+    pins.servoWritePin(AnalogPin.P13, 80)
+    basic.pause(2000)
+    pins.servoWritePin(AnalogPin.P13, 175)
+})
 let vlhkost = 0
 let teplota = 0
+let plyn = 0
+let PIR = 0
 let okolni_svetlo = 0
 let strip: neopixel.Strip = null
 basic.clearScreen()
@@ -30,6 +59,7 @@ pins.digitalWritePin(DigitalPin.P16, 0)
 strip = neopixel.create(DigitalPin.P6, 4, NeoPixelMode.RGB)
 pins.servoWritePin(AnalogPin.P16, 175)
 makerbit.connectLcd(39)
+pins.servoWritePin(AnalogPin.P13, 175)
 basic.forever(function () {
     okol_svetlo()
     teplota = SmartCity.readData(SmartCity.DHT11dataType.temperature, DigitalPin.P1)
@@ -47,4 +77,6 @@ basic.forever(function () {
     } else {
         PIR = 0
     }
+    vstup_svetlo()
+    plyn_alarm()
 })
